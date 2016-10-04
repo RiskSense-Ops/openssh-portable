@@ -370,8 +370,8 @@ void usage(void);
 int
 main(int argc, char **argv)
 {
-	int ch, fflag, tflag, status, n;
-	char *targ, **newargv;
+	int ch, fflag, tflag, status, n, pathidx;
+	char *targ, **newargv, *pathswap;
 	const char *errstr;
 	extern char *optarg;
 	extern int optind;
@@ -380,6 +380,19 @@ main(int argc, char **argv)
 	sanitise_stdfd();
 
 	setlocale(LC_CTYPE, "");
+
+        /* Move paths to end */
+	pathidx = 0;
+        for (n = 1; n < argc; n++) {
+                if(argv[n][0] != '-') {
+                        pathswap = argv[argc-2+pathidx];
+			argv[argc-2+pathidx] = argv[n];
+			argv[n] = pathswap;
+			pathidx += 1;
+			n--;
+		}
+		if(pathidx >= 2) break;
+        }
 
 	/* Copy argv, because we modify it */
 	newargv = xcalloc(MAXIMUM(argc + 1, 1), sizeof(*newargv));
